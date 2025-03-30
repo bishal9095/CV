@@ -1,0 +1,90 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+Link to the page:https://dbdiagram.io/d/67e79f504f7afba184a534e6
+
+Table leads {
+  lead_id INT [primary key]
+  sales_person_id INT [not null, ref: > sales_person.sales_person_id]
+  company_id INT [not null, ref: > company.company_id]
+  contact_person_id INT [not null, ref: > contact_person.contact_person_id]
+  lead_source ENUM('internal', 'external') [not null]
+  lead_status ENUM('active', 'done', 'pending', 'lost') [not null]
+  expected_annual_revenue DECIMAL(15,2)
+  description TEXT
+  created_at TIMESTAMP 
+}
+
+Table leads_products {
+  lead_id INT [not null, ref: > leads.lead_id]
+  product_id INT [not null, ref: > products.product_id]
+}
+
+Table deals {
+  deal_id INT [primary key]
+  sales_person_id INT [not null, ref: > sales_person.sales_person_id]
+  deal_name VARCHAR(255) [not null]
+  company_id INT [not null, ref: > company.company_id]
+  closing_date DATE
+  stage_id INT [not null, ref: > stage.stage_id]
+  expected_annual_revenue DECIMAL(15,2)
+  contact_person_id INT [not null, ref: > contact_person.contact_person_id]
+  description TEXT
+  created_at TIMESTAMP 
+}
+
+Table deals_products {
+  deal_id INT [not null, ref: > deals.deal_id]
+  product_id INT [not null, ref: > products.product_id]
+}
+
+Table products {
+  product_id INT [primary key]
+  product_name VARCHAR(255) [not null]
+  price DECIMAL(10,2)
+  description TEXT
+  created_at TIMESTAMP 
+}
+
+Table stage {
+  stage_id INT [primary key]
+  deal_id INT [not null, ref: > deals.deal_id]
+  status ENUM('qualification','decision-maker identification','negotiation', 'proposal sent', 'closed-won', 'closed-lost') [not null]
+  updated_at TIMESTAMP 
+}
+
+Table company {
+  company_id INT [primary key]
+  company_name VARCHAR(255) [not null]
+  company_mobile VARCHAR(20) [not null]
+  address_id INT [not null, ref: > address.address_id]
+  created_at TIMESTAMP 
+}
+
+Table contact_person {
+  contact_person_id INT [primary key]
+  company_id INT [not null, ref: > company.company_id]
+  full_name VARCHAR(255) [not null]
+  mobile_number VARCHAR(20) [not null]
+  email VARCHAR(255) [unique]
+  created_at TIMESTAMP 
+}
+
+Table address {
+  address_id INT [primary key]
+  street VARCHAR(255)
+  city VARCHAR(100)
+  state VARCHAR(100)
+  zipcode VARCHAR(20)
+  country VARCHAR(100)
+}
+
+Table sales_person {
+  sales_person_id INT [primary key]
+  full_name VARCHAR(255) [not null]
+  email VARCHAR(255) [unique]
+  mobile_number VARCHAR(20) [not null]
+}
+
+
+
+
