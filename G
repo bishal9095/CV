@@ -1,0 +1,46 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+# Data from your experiment
+nad_conc = np.array([0.025, 0.05, 0.1, 0.2, 0.4, 0.8, 1.6, 3.2, 6.4, 12.8, 25.6, 51.2, 102.4])  # µM
+delta_od_sec = np.array([
+    0.000227293, 0.000437085, 0.000966353, 0.00141814, 0.00187274,
+    0.00345092, 0.00407633, 0.0043868, 0.00475311, 0.0050402,
+    0.00505594, 0.00514847, 0.00538164
+])
+
+# Constants
+extinction_coeff = 0.00622  # µM^-1 cm^-1
+path_length = 1.0  # cm
+
+# Convert delta OD/sec to velocity in µM/sec
+velocity = delta_od_sec / (extinction_coeff * path_length)
+
+# Michaelis-Menten function
+def michaelis_menten(S, Vmax, Km):
+    return (Vmax * S) / (Km + S)
+
+# Fit the data
+popt, pcov = curve_fit(michaelis_menten, nad_conc, velocity)
+Vmax, Km = popt
+Vmax_std, Km_std = np.sqrt(np.diag(pcov))
+
+# Plot the fit
+S_fit = np.linspace(min(nad_conc), max(nad_conc), 500)
+v_fit = michaelis_menten(S_fit, *popt)
+
+plt.figure(figsize=(8, 5))
+plt.scatter(nad_conc, velocity, label='Experimental data', color='blue')
+plt.plot(S_fit, v_fit, label='Michaelis-Menten fit', color='red')
+plt.xlabel('[NAD⁺] (µM)')
+plt.ylabel('Initial velocity (µM/s)')
+plt.title('Michaelis-Menten Fit for NAD⁺')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# Output Km and Vmax
+print(f"Apparent Km (NAD⁺): {Km:.2f} ± {Km_std:.2f} µM")
+print(f"Vmax: {Vmax:.4f} ± {Vmax_std:.4f} µM/s")
